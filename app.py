@@ -1,33 +1,50 @@
 import streamlit as st
-import joblib
-import pandas as pd  # Needed for model input format
+import pandas as pd
+from sklearn.pipeline import make_pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
 
-# Map of numeric labels to topic names
-TOPIC_LABELS = {
-    0: "Technology",
-    1: "Finance",
-    2: "Health",
-    3: "Politics",
-    4: "Sports",
-    5: "Food",
-    # Add more if needed
+# Training data
+data = {
+    "text": [
+        "The stock market is doing well",         # Finance
+        "Invest in cryptocurrency and NFTs",      # Finance
+        "Apple releases new iPhone",              # Technology
+        "Artificial intelligence is booming",     # Technology
+        "New vaccine approved by health board",   # Health
+        "Meditation helps reduce stress",         # Health
+        "Elections coming up this November",      # Politics
+        "The president gave a speech today",      # Politics
+        "The soccer match was intense",           # Sports
+        "Olympics are scheduled next year",       # Sports
+        "I love eating pizza and sandwiches",     # Food
+        "Burgers and fries are my favorite food", # Food
+    ],
+    "label": [
+        "Finance", "Finance",
+        "Technology", "Technology",
+        "Health", "Health",
+        "Politics", "Politics",
+        "Sports", "Sports",
+        "Food", "Food"
+    ]
 }
 
+# Create a simple pipeline
+df = pd.DataFrame(data)
+model = make_pipeline(TfidfVectorizer(), MultinomialNB())
+model.fit(df["text"], df["label"])
+
+# Streamlit UI
 def run():
-    model = joblib.load(open('model.joblib', 'rb'))
-
     st.title("Topic Classifier")
-    st.text("Enter a sentence and I'll try to guess its topic.")
-    st.text("")
+    st.write("Enter a sentence and I'll try to guess its topic.")
     
-    userinput = st.text_input('Enter your sentence below:', placeholder='e.g., The stock market crashed today...')
-    st.text("")
-
+    userinput = st.text_input("Your sentence:", placeholder="e.g., I just bought some Bitcoin")
+    
     if st.button("Classify"):
-        input_series = pd.Series([userinput])  # Ensure correct format for model
-        label = model.predict(input_series)[0]
-        topic = TOPIC_LABELS.get(label, f"Unknown (label: {label})")
-        st.success(f'Topic: **{topic}**')
+        prediction = model.predict([userinput])[0]
+        st.success(f"Predicted Topic: **{prediction}**")
 
 if __name__ == "__main__":
     run()
