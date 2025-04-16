@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from models import load_model, predict_topic  # assuming you have a predict_topic function in models.py
 from utils import preprocess_text  # assuming utils.py has a function to preprocess input text
 
 # Load the model when the app starts
