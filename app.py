@@ -25,6 +25,7 @@ user_input = st.text_area('Enter your text here')
 if st.button('Predict Topic'):
     if user_input:
         # Preprocess the input
+        # Wrap the input text in a pandas Series to apply the preprocessor.transform method
         processed_text = text_preprocessor.transform(pd.Series([user_input]))[0]  # Apply transform and get the first result
         
         # Get the predicted topic
