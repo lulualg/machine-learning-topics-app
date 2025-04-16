@@ -1,38 +1,46 @@
-
-# utils.py
-# Custom text preprocessor for NLP pipeline
-
-import re
-import string
+import numpy as np
+import pandas as pd
+import regex as re
+import joblib
+import en_core_web_sm
 
 from sklearn.base import BaseEstimator, TransformerMixin
-import spacy
+from sklearn.svm import LinearSVC
 
-# Load small English model
-nlp = spacy.load("en_core_web_sm")
+nlp = en_core_web_sm.load()
+classifier = LinearSVC()
 
-# Custom stopwords list (can be expanded)
-STOPWORDS = set([
-    "the", "and", "is", "in", "it", "of", "to", "a", "an", "on", "for", "with"
-])
+def clean_text(text):
+    # reduce multiple spaces and newlines to only one
+    text = re.sub(r'(\s\s+|\n\n+)', r'\1', text)
+    # remove double quotes
+    text = re.sub(r'"', '', text)
 
-class preprocessor(BaseEstimator, TransformerMixin):
+    return text
+	
+def convert_text(text):
+    sent = nlp(text)
+    ents = {x.text: x for x in sent.ents}
+    tokens = []
+    for w in sent:
+        if w.is_stop or w.is_punct:
+            continue
+        if w.text in ents:
+            tokens.append(w.text)
+        else:
+            tokens.append(w.lemma_.lower())
+    text = ' '.join(tokens)
+
+    return text
+
+
+class preprocessor(TransformerMixin, BaseEstimator):
+
     def __init__(self):
         pass
 
     def fit(self, X, y=None):
         return self
 
-    def transform(self, X, y=None):
-        return X.apply(self._clean_text)
-
-    def _clean_text(self, text):
-        text = text.lower()
-        text = re.sub(f"[{re.escape(string.punctuation)}]", "", text)
-        doc = nlp(text)
-        tokens = [
-            token.lemma_
-            for token in doc
-            if token.text not in STOPWORDS and not token.is_space
-        ]
-        return " ".join(tokens)
+    def transform(self, X):
+        return X.apply(clean_text).apply(convert_text)
