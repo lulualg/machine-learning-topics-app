@@ -28,7 +28,10 @@ if st.button('Predict Topic'):
         user_input_series = pd.Series([user_input])  # Wrapping the input string in a Series
 
         # Preprocess the input (this applies both the clean_text and convert_text functions)
-        processed_text = text_preprocessor.transform(user_input_series)[0]  # Apply transform and get the first result
+        processed_text = text_preprocessor.transform(user_input_series)  # This will return a Series
+        
+        # If the model expects a single input text, extract the processed text from the Series
+        processed_text = processed_text[0]  # Since transform returns a Series, we select the first item
         
         # Get the predicted topic from the model
         topic = model.predict([processed_text])[0]  # Use the model to predict the topic
