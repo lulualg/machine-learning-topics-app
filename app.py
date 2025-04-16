@@ -1,5 +1,6 @@
 import streamlit as st
 import joblib
+import pandas as pd  # Needed for model input format
 
 def run():
     model = joblib.load(open('model.joblib', 'rb'))
@@ -12,7 +13,8 @@ def run():
     st.text("")
 
     if st.button("Classify"):
-        prediction = model.predict([userinput])[0]
+        input_series = pd.Series([userinput])  # Ensure correct format for model
+        prediction = model.predict(input_series)[0]
         st.success(f'Topic: **{prediction}**')
 
 if __name__ == "__main__":
