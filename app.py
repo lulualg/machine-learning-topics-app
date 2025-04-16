@@ -2,6 +2,17 @@ import streamlit as st
 import joblib
 import pandas as pd  # Needed for model input format
 
+# Map of numeric labels to topic names
+TOPIC_LABELS = {
+    0: "Technology",
+    1: "Finance",
+    2: "Health",
+    3: "Politics",
+    4: "Sports",
+    5: "Food",
+    # Add more if needed
+}
+
 def run():
     model = joblib.load(open('model.joblib', 'rb'))
 
@@ -14,8 +25,9 @@ def run():
 
     if st.button("Classify"):
         input_series = pd.Series([userinput])  # Ensure correct format for model
-        prediction = model.predict(input_series)[0]
-        st.success(f'Topic: **{prediction}**')
+        label = model.predict(input_series)[0]
+        topic = TOPIC_LABELS.get(label, f"Unknown (label: {label})")
+        st.success(f'Topic: **{topic}**')
 
 if __name__ == "__main__":
     run()
