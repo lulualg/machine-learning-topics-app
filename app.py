@@ -23,10 +23,10 @@ user_input = st.text_area('Enter your text here')
 if st.button('Predict Topic'):
     if user_input:
         # Preprocess the input
-        processed_text = preprocess_text(user_input)
+        processed_text = preprocessor(user_input)
         
         # Get the predicted topic
-        topic = predict_topic(processed_text, model)
+        topic = preprocessor(processed_text, model)
         
         # Display the predicted topic
         st.write(f'The predicted topic is: {topic}')
