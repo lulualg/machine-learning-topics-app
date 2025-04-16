@@ -2,11 +2,13 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-from utils import preprocessor  # assuming utils.py has a function to preprocess input text
+from utils import preprocessor  # Import the preprocessor class from utils.py
 
 # Load the model when the app starts
-#model = load_model()
 model = joblib.load(open('model.joblib', 'rb'))
+
+# Instantiate the preprocessor class
+text_preprocessor = preprocessor()
 
 # Streamlit interface
 st.title('Topic Classifier')
@@ -23,10 +25,10 @@ user_input = st.text_area('Enter your text here')
 if st.button('Predict Topic'):
     if user_input:
         # Preprocess the input
-        processed_text = preprocessor(user_input)
+        processed_text = text_preprocessor.transform(pd.Series([user_input]))[0]  # Apply transform and get the first result
         
         # Get the predicted topic
-        topic = preprocessor(processed_text, model)
+        topic = model.predict([processed_text])[0]  # Use the model to predict the topic
         
         # Display the predicted topic
         st.write(f'The predicted topic is: {topic}')
