@@ -1,25 +1,34 @@
 import streamlit as st
 import pandas as pd
-import joblib
-from utils import preprocessor
+import numpy as np
+from models import load_model, predict_topic  # assuming you have a predict_topic function in models.py
+from utils import preprocess_text  # assuming utils.py has a function to preprocess input text
 
-def run():
-    model = joblib.load(open('model.joblib', 'rb'))
+# Load the model when the app starts
+#model = load_model()
+model = joblib.load(open('model.joblib', 'rb'))
 
-    st.title("Sentiment Analysis")
-    st.text("Basic app to detect the sentiment of text.")
-    st.text("")
-    userinput = st.text_input('Enter text below, then click the Predict button.', placeholder='Input text HERE')
-    st.text("")
-    predicted_sentiment = ""
-    if st.button("Predict"):
-        predicted_sentiment = model.predict(pd.Series(userinput))[0]
-        if predicted_sentiment == 1:
-            output = 'positive 👍'
-        else:
-            output = 'negative 👎'
-        sentiment=f'Predicted sentiment of "{userinput}" is {output}.'
-        st.success(sentiment)
+# Streamlit interface
+st.title('Topic Classifier')
 
-if __name__ == "__main__":
-    run()
+st.write("""
+    This app classifies topics based on your input text. 
+    Type a sentence or a paragraph, and the app will predict the topic!
+""")
+
+# User input
+user_input = st.text_area('Enter your text here')
+
+# Process the user input and get the prediction when the user submits
+if st.button('Predict Topic'):
+    if user_input:
+        # Preprocess the input
+        processed_text = preprocess_text(user_input)
+        
+        # Get the predicted topic
+        topic = predict_topic(processed_text, model)
+        
+        # Display the predicted topic
+        st.write(f'The predicted topic is: {topic}')
+    else:
+        st.write('Please enter some text to classify.')
