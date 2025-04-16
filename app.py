@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from utils import preprocess_text  # assuming utils.py has a function to preprocess input text
+import joblib
+from utils import preprocessor  # assuming utils.py has a function to preprocess input text
 
 # Load the model when the app starts
 #model = load_model()
